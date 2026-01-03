@@ -4,11 +4,14 @@
   "description": "Data Factory - Domain Model Training Platform for collecting data, training models, and handing off to MVP Factory",
   "main": "index.js",
   "scripts": {
+    "forge": "npm run dev --prefix apps/forge-web",
+    "forge:dev": "npm run dev --prefix apps/forge-web",
+    "forge:build": "npm run build --prefix apps/forge-web",
+    "forge:status": "node scripts/check-gates.js",
+    "forge:projects": "node scripts/list-projects.js",
     "create-project": "node scripts/create-project.js",
     "validate:dataset": "node scripts/validate-dataset.js",
     "check:gates": "node scripts/check-gates.js",
-    "forge:dev": "cd apps/forge-web && npm run dev",
-    "forge:build": "cd apps/forge-web && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
