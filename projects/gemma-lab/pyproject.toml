@@ -1,0 +1,32 @@
+[project]
+name = "gemma-lab"
+version = "0.1.0"
+description = "Gemma 3 Local Lab"
+requires-python = ">=3.11"
+dependencies = [
+    "torch",
+    "transformers",
+    "accelerate",
+    "bitsandbytes",
+    "huggingface_hub",
+    "python-dotenv",
+    "pillow",
+    "requests",
+    "beautifulsoup4"
+]
+
+[[tool.uv.index]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch" },
+]
+torchvision = [
+  { index = "pytorch" },
+]
+torchaudio = [
+  { index = "pytorch" },
+]
