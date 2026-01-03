@@ -1,0 +1,265 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://data-factory.ekow.solutions/schemas/annotation.schema.json",
+  "title": "Annotation Schema",
+  "description": "JSON Schema for annotated data before training format conversion",
+  "type": "object",
+  "required": ["id", "source", "raw_text", "annotations"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the annotated sample",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "source": {
+      "type": "object",
+      "description": "Information about the data source",
+      "required": ["id", "type"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Source identifier"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["textbook", "curriculum", "interview", "web", "corpus", "expert", "student_work"],
+          "description": "Type of source material"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable source name"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL if web-sourced"
+        },
+        "consent_status": {
+          "type": "string",
+          "enum": ["obtained", "public_domain", "fair_use", "pending", "denied"],
+          "description": "Data consent/licensing status"
+        },
+        "consent_document": {
+          "type": "string",
+          "description": "Path to consent documentation"
+        }
+      }
+    },
+    "raw_text": {
+      "type": "string",
+      "description": "Original unprocessed text content",
+      "minLength": 1
+    },
+    "cleaned_text": {
+      "type": "string",
+      "description": "Cleaned/normalized text content"
+    },
+    "annotations": {
+      "type": "object",
+      "description": "Domain-specific annotations",
+      "required": ["topic", "language"],
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "Primary topic category"
+        },
+        "subtopics": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Secondary topic tags"
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": ["elementary", "middle", "high", "university", "professional"],
+          "description": "Educational difficulty level"
+        },
+        "grade_level": {
+          "type": "string",
+          "description": "Specific grade level (e.g., 'JHS 2', 'SHS 1')"
+        },
+        "language": {
+          "type": "string",
+          "description": "Primary language code"
+        },
+        "dialect": {
+          "type": "string",
+          "description": "Specific dialect if applicable"
+        },
+        "dialect_markers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Local dialect terms or phrases identified"
+        },
+        "local_context": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Local/cultural context references"
+        },
+        "curriculum_alignment": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "curriculum": { "type": "string" },
+              "subject": { "type": "string" },
+              "unit": { "type": "string" },
+              "standard": { "type": "string" }
+            }
+          },
+          "description": "Alignment to educational standards"
+        },
+        "content_type": {
+          "type": "string",
+          "enum": ["explanation", "question", "example", "problem", "definition", "procedure", "narrative"],
+          "description": "Type of educational content"
+        },
+        "quality_indicators": {
+          "type": "object",
+          "properties": {
+            "factual_accuracy": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "cultural_appropriateness": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "pedagogical_value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "language_quality": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        },
+        "flags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["needs_review", "contains_errors", "outdated", "sensitive", "excellent"]
+          },
+          "description": "Quality or review flags"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Annotator notes or comments"
+        }
+      }
+    },
+    "annotator": {
+      "type": "object",
+      "description": "Information about who created this annotation",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Annotator identifier"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["domain_expert", "teacher", "curriculum_specialist", "language_expert", "data_scientist"],
+          "description": "Annotator's role"
+        },
+        "expertise": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Areas of expertise"
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "description": "Review status and history",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "approved", "rejected", "needs_revision"],
+          "description": "Current review status"
+        },
+        "reviewer_id": {
+          "type": "string"
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "comments": {
+          "type": "string"
+        },
+        "revision_history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": { "type": "string", "format": "date-time" },
+              "annotator_id": { "type": "string" },
+              "changes": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "examples": [
+    {
+      "id": "sample-001",
+      "source": {
+        "id": "ghana-math-curriculum-jhs2",
+        "type": "curriculum",
+        "name": "Ghana Education Service JHS Mathematics Curriculum",
+        "consent_status": "public_domain"
+      },
+      "raw_text": "Calculate the profit when buying goods at cost price and selling at selling price.",
+      "cleaned_text": "Calculate profit: Profit = Selling Price - Cost Price",
+      "annotations": {
+        "topic": "arithmetic",
+        "subtopics": ["profit-loss", "business-math"],
+        "difficulty": "middle",
+        "grade_level": "JHS 2",
+        "language": "en-gh",
+        "dialect_markers": [],
+        "local_context": ["market", "trading"],
+        "curriculum_alignment": [
+          {
+            "curriculum": "GES Mathematics",
+            "subject": "Mathematics",
+            "unit": "Commercial Arithmetic",
+            "standard": "MA.JHS2.CA.1"
+          }
+        ],
+        "content_type": "procedure",
+        "quality_indicators": {
+          "factual_accuracy": 100,
+          "cultural_appropriateness": 90,
+          "pedagogical_value": 85,
+          "language_quality": 95
+        }
+      },
+      "annotator": {
+        "id": "expert-001",
+        "role": "teacher",
+        "expertise": ["mathematics", "JHS curriculum"]
+      },
+      "review": {
+        "status": "approved",
+        "reviewer_id": "reviewer-001",
+        "reviewed_at": "2024-12-15T10:30:00Z"
+      },
+      "created_at": "2024-12-10T08:00:00Z",
+      "updated_at": "2024-12-15T10:30:00Z"
+    }
+  ]
+}

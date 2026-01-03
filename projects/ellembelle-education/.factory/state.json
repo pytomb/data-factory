@@ -1,0 +1,44 @@
+{
+  "project_name": "ellembelle-education",
+  "created_at": "2026-01-03T03:36:14.856Z",
+  "last_updated": "2026-01-03T03:45:00.000Z",
+  "execution_mode": "interactive",
+  "current_step": "sources",
+  "steps": {
+    "intake": { "status": "completed", "started_at": "2026-01-03T03:36:14.856Z", "completed_at": "2026-01-03T03:40:00.000Z", "output_files": ["docs/domain-brief.md"], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "sources": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "ethics": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "capture": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "annotate": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "validate": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "clean": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "format": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "split": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "baseline": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "finetune": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "evaluate": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "quantize": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "registry": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "edge-test": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "model-card": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "api-spec": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "examples": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null }
+  },
+  "gates": {},
+  "reviews": {},
+  "audit_log": [
+    {
+      "timestamp": "2026-01-03T03:36:14.856Z",
+      "action": "project_created",
+      "details": "Data Factory project initialized",
+      "actor": "system"
+    },
+    {
+      "timestamp": "2026-01-03T03:40:00.000Z",
+      "action": "step_completed",
+      "step": "intake",
+      "details": "Domain Brief created with Ellembelle STEM Tutor specifications",
+      "actor": "system"
+    }
+  ]
+}

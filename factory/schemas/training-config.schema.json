@@ -1,0 +1,377 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://data-factory.ekow.solutions/schemas/training-config.schema.json",
+  "title": "Training Configuration Schema",
+  "description": "JSON Schema for Unsloth fine-tuning configuration",
+  "type": "object",
+  "required": ["model", "lora", "training", "dataset"],
+  "properties": {
+    "model": {
+      "type": "object",
+      "description": "Base model configuration",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Unsloth model ID (e.g., unsloth/gemma-3-4b-it)",
+          "examples": [
+            "unsloth/gemma-3-4b-it",
+            "unsloth/gemma-3-12b-it",
+            "unsloth/gemma-3-27b-it",
+            "unsloth/Llama-3.1-8B-Instruct",
+            "unsloth/Mistral-7B-Instruct-v0.3",
+            "unsloth/Qwen2.5-7B-Instruct"
+          ]
+        },
+        "max_seq_length": {
+          "type": "integer",
+          "description": "Maximum sequence length for training",
+          "default": 2048,
+          "minimum": 256,
+          "maximum": 131072
+        },
+        "dtype": {
+          "type": ["string", "null"],
+          "description": "Data type for training. null for auto-detect (float16 for T4/V100, bfloat16 for Ampere+)",
+          "enum": [null, "float16", "bfloat16"],
+          "default": null
+        },
+        "load_in_4bit": {
+          "type": "boolean",
+          "description": "Use 4-bit quantization to reduce memory usage",
+          "default": true
+        }
+      }
+    },
+    "lora": {
+      "type": "object",
+      "description": "LoRA (Low-Rank Adaptation) configuration",
+      "properties": {
+        "r": {
+          "type": "integer",
+          "description": "LoRA rank. Higher = more parameters updated, more memory",
+          "default": 8,
+          "enum": [4, 8, 16, 32, 64, 128]
+        },
+        "lora_alpha": {
+          "type": "integer",
+          "description": "LoRA scaling factor. Usually 2x the rank",
+          "default": 16
+        },
+        "lora_dropout": {
+          "type": "number",
+          "description": "Dropout rate for LoRA layers. 0 is optimized by Unsloth",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 0.5
+        },
+        "target_modules": {
+          "type": "array",
+          "description": "Model modules to apply LoRA to",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "q_proj", "k_proj", "v_proj", "o_proj",
+            "gate_proj", "up_proj", "down_proj"
+          ]
+        },
+        "bias": {
+          "type": "string",
+          "description": "Bias training mode. 'none' is optimized by Unsloth",
+          "enum": ["none", "all", "lora_only"],
+          "default": "none"
+        },
+        "use_gradient_checkpointing": {
+          "type": ["boolean", "string"],
+          "description": "Enable gradient checkpointing for memory efficiency. 'unsloth' is recommended",
+          "default": "unsloth"
+        },
+        "random_state": {
+          "type": "integer",
+          "description": "Random seed for reproducibility",
+          "default": 3407
+        },
+        "use_rslora": {
+          "type": "boolean",
+          "description": "Use Rank-Stabilized LoRA",
+          "default": false
+        },
+        "finetune_vision_layers": {
+          "type": "boolean",
+          "description": "Fine-tune vision layers (for multimodal models)",
+          "default": false
+        },
+        "finetune_language_layers": {
+          "type": "boolean",
+          "description": "Fine-tune language layers",
+          "default": true
+        },
+        "finetune_attention_modules": {
+          "type": "boolean",
+          "description": "Fine-tune attention modules",
+          "default": true
+        },
+        "finetune_mlp_modules": {
+          "type": "boolean",
+          "description": "Fine-tune MLP modules",
+          "default": true
+        }
+      }
+    },
+    "training": {
+      "type": "object",
+      "description": "Training hyperparameters",
+      "properties": {
+        "per_device_train_batch_size": {
+          "type": "integer",
+          "description": "Batch size per GPU",
+          "default": 2,
+          "minimum": 1,
+          "maximum": 64
+        },
+        "gradient_accumulation_steps": {
+          "type": "integer",
+          "description": "Accumulate gradients over N steps (effective batch = batch_size × accumulation)",
+          "default": 4,
+          "minimum": 1
+        },
+        "warmup_steps": {
+          "type": "integer",
+          "description": "Number of warmup steps for learning rate scheduler",
+          "default": 5,
+          "minimum": 0
+        },
+        "max_steps": {
+          "type": ["integer", "null"],
+          "description": "Maximum training steps. null for full training based on epochs",
+          "default": null
+        },
+        "num_train_epochs": {
+          "type": "number",
+          "description": "Number of training epochs (used if max_steps is null)",
+          "default": 3
+        },
+        "learning_rate": {
+          "type": "number",
+          "description": "Initial learning rate",
+          "default": 2e-4,
+          "minimum": 1e-6,
+          "maximum": 1e-2
+        },
+        "lr_scheduler_type": {
+          "type": "string",
+          "description": "Learning rate scheduler type",
+          "enum": ["linear", "cosine", "constant", "polynomial"],
+          "default": "linear"
+        },
+        "optim": {
+          "type": "string",
+          "description": "Optimizer. adamw_8bit is memory-efficient",
+          "enum": ["adamw_8bit", "adamw_torch", "sgd", "adafactor"],
+          "default": "adamw_8bit"
+        },
+        "weight_decay": {
+          "type": "number",
+          "description": "Weight decay for regularization",
+          "default": 0.01
+        },
+        "logging_steps": {
+          "type": "integer",
+          "description": "Log metrics every N steps",
+          "default": 1
+        },
+        "save_steps": {
+          "type": "integer",
+          "description": "Save checkpoint every N steps",
+          "default": 500
+        },
+        "seed": {
+          "type": "integer",
+          "description": "Random seed for reproducibility",
+          "default": 3407
+        },
+        "output_dir": {
+          "type": "string",
+          "description": "Directory for training outputs",
+          "default": "outputs"
+        },
+        "fp16": {
+          "type": ["boolean", "null"],
+          "description": "Use FP16 training. Auto-detected if null",
+          "default": null
+        },
+        "bf16": {
+          "type": ["boolean", "null"],
+          "description": "Use BF16 training (Ampere+ GPUs). Auto-detected if null",
+          "default": null
+        }
+      }
+    },
+    "dataset": {
+      "type": "object",
+      "description": "Dataset configuration",
+      "required": ["path"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Path to training dataset (JSONL file or HuggingFace dataset ID)",
+          "default": "data/splits/train.jsonl"
+        },
+        "validation_path": {
+          "type": "string",
+          "description": "Path to validation dataset"
+        },
+        "text_field": {
+          "type": "string",
+          "description": "Field name containing formatted text",
+          "default": "text"
+        },
+        "chat_template": {
+          "type": "string",
+          "description": "Chat template to apply",
+          "enum": ["gemma-3", "llama-3", "mistral", "chatml", "zephyr"],
+          "default": "gemma-3"
+        },
+        "num_proc": {
+          "type": "integer",
+          "description": "Number of processes for dataset preprocessing",
+          "default": 2
+        }
+      }
+    },
+    "save": {
+      "type": "object",
+      "description": "Model saving configuration",
+      "properties": {
+        "lora_path": {
+          "type": "string",
+          "description": "Path to save LoRA adapters",
+          "default": "models/checkpoints/lora"
+        },
+        "merged_path": {
+          "type": "string",
+          "description": "Path to save merged model",
+          "default": "models/checkpoints/merged"
+        },
+        "gguf_path": {
+          "type": "string",
+          "description": "Path to save GGUF quantized model",
+          "default": "models/quantized"
+        },
+        "gguf_quantization": {
+          "type": "string",
+          "description": "GGUF quantization method",
+          "enum": ["Q4_K_M", "Q5_K_M", "Q8_0", "f16", "bf16"],
+          "default": "Q8_0"
+        },
+        "push_to_hub": {
+          "type": "boolean",
+          "description": "Push model to HuggingFace Hub after training",
+          "default": false
+        },
+        "hub_model_id": {
+          "type": "string",
+          "description": "HuggingFace Hub model ID (username/model-name)"
+        }
+      }
+    },
+    "wandb": {
+      "type": "object",
+      "description": "Weights & Biases experiment tracking",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable W&B logging",
+          "default": false
+        },
+        "project": {
+          "type": "string",
+          "description": "W&B project name"
+        },
+        "run_name": {
+          "type": "string",
+          "description": "W&B run name"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "$comment": "Minimal configuration for Gemma 3 4B",
+      "model": {
+        "name": "unsloth/gemma-3-4b-it",
+        "max_seq_length": 2048,
+        "load_in_4bit": true
+      },
+      "lora": {
+        "r": 8,
+        "lora_alpha": 16
+      },
+      "training": {
+        "per_device_train_batch_size": 2,
+        "gradient_accumulation_steps": 4,
+        "num_train_epochs": 3,
+        "learning_rate": 2e-4
+      },
+      "dataset": {
+        "path": "data/splits/train.jsonl",
+        "chat_template": "gemma-3"
+      }
+    },
+    {
+      "$comment": "Full configuration with all options",
+      "model": {
+        "name": "unsloth/gemma-3-12b-it",
+        "max_seq_length": 4096,
+        "dtype": "bfloat16",
+        "load_in_4bit": true
+      },
+      "lora": {
+        "r": 16,
+        "lora_alpha": 32,
+        "lora_dropout": 0,
+        "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+        "bias": "none",
+        "use_gradient_checkpointing": "unsloth",
+        "random_state": 42,
+        "finetune_vision_layers": false,
+        "finetune_language_layers": true,
+        "finetune_attention_modules": true,
+        "finetune_mlp_modules": true
+      },
+      "training": {
+        "per_device_train_batch_size": 4,
+        "gradient_accumulation_steps": 2,
+        "warmup_steps": 10,
+        "num_train_epochs": 3,
+        "learning_rate": 1e-4,
+        "lr_scheduler_type": "cosine",
+        "optim": "adamw_8bit",
+        "weight_decay": 0.01,
+        "logging_steps": 10,
+        "save_steps": 100,
+        "seed": 42
+      },
+      "dataset": {
+        "path": "data/splits/train.jsonl",
+        "validation_path": "data/splits/val.jsonl",
+        "chat_template": "gemma-3",
+        "num_proc": 4
+      },
+      "save": {
+        "lora_path": "models/checkpoints/lora",
+        "merged_path": "models/checkpoints/merged",
+        "gguf_path": "models/quantized",
+        "gguf_quantization": "Q8_0",
+        "push_to_hub": true,
+        "hub_model_id": "ekow/ellembelle-education-gemma3-4b"
+      },
+      "wandb": {
+        "enabled": true,
+        "project": "ellembelle-education",
+        "run_name": "gemma3-finetune-v1"
+      }
+    }
+  ]
+}

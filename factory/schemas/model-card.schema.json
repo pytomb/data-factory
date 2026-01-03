@@ -1,0 +1,360 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://data-factory.ekow.solutions/schemas/model-card.schema.json",
+  "title": "Model Card Schema",
+  "description": "JSON Schema for model documentation following HuggingFace Model Card format",
+  "type": "object",
+  "required": ["model_id", "base_model", "domain", "training_data", "evaluation", "intended_use"],
+  "properties": {
+    "model_id": {
+      "type": "string",
+      "description": "Unique model identifier (e.g., 'dnice1975/ellembelle-tutor-v1')"
+    },
+    "model_name": {
+      "type": "string",
+      "description": "Human-readable model name"
+    },
+    "version": {
+      "type": "string",
+      "description": "Model version"
+    },
+    "base_model": {
+      "type": "object",
+      "required": ["id", "provider"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Base model identifier"
+        },
+        "provider": {
+          "type": "string",
+          "description": "Model provider (e.g., 'google', 'meta')"
+        },
+        "size": {
+          "type": "string",
+          "description": "Model size (e.g., '2B', '7B')"
+        },
+        "architecture": {
+          "type": "string",
+          "description": "Model architecture"
+        }
+      }
+    },
+    "domain": {
+      "type": "object",
+      "required": ["name", "languages"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Domain name (e.g., 'education', 'healthcare')"
+        },
+        "subdomain": {
+          "type": "string",
+          "description": "Specific subdomain"
+        },
+        "languages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Supported language codes"
+        },
+        "regions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Geographic regions of focus"
+        },
+        "cultural_context": {
+          "type": "string",
+          "description": "Cultural context description"
+        }
+      }
+    },
+    "training_data": {
+      "type": "object",
+      "required": ["sample_count", "sources"],
+      "properties": {
+        "sample_count": {
+          "type": "integer",
+          "description": "Total training examples"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "type": "string" },
+              "percentage": { "type": "number" }
+            }
+          }
+        },
+        "data_collection_period": {
+          "type": "string",
+          "description": "When data was collected"
+        },
+        "preprocessing": {
+          "type": "string",
+          "description": "Data preprocessing steps applied"
+        },
+        "splits": {
+          "type": "object",
+          "properties": {
+            "train": { "type": "integer" },
+            "validation": { "type": "integer" },
+            "test": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "training_procedure": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["full_finetune", "lora", "qlora", "prefix_tuning"],
+          "description": "Fine-tuning method"
+        },
+        "framework": {
+          "type": "string",
+          "description": "Training framework used (e.g., 'unsloth', 'axolotl')"
+        },
+        "hyperparameters": {
+          "type": "object",
+          "properties": {
+            "learning_rate": { "type": "number" },
+            "epochs": { "type": "integer" },
+            "batch_size": { "type": "integer" },
+            "max_seq_length": { "type": "integer" },
+            "lora_r": { "type": "integer" },
+            "lora_alpha": { "type": "integer" }
+          }
+        },
+        "compute": {
+          "type": "object",
+          "properties": {
+            "hardware": { "type": "string" },
+            "training_time": { "type": "string" },
+            "cost_estimate": { "type": "string" }
+          }
+        }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "required": ["baseline", "finetuned"],
+      "properties": {
+        "baseline": {
+          "type": "object",
+          "description": "Base model performance metrics",
+          "properties": {
+            "localization_score": { "type": "number" },
+            "factual_accuracy": { "type": "number" },
+            "perplexity": { "type": "number" }
+          }
+        },
+        "finetuned": {
+          "type": "object",
+          "description": "Fine-tuned model performance metrics",
+          "properties": {
+            "localization_score": { "type": "number" },
+            "factual_accuracy": { "type": "number" },
+            "perplexity": { "type": "number" },
+            "human_preference_rate": { "type": "number" }
+          }
+        },
+        "improvement": {
+          "type": "object",
+          "description": "Improvement over baseline",
+          "properties": {
+            "localization_delta": { "type": "number" },
+            "accuracy_delta": { "type": "number" },
+            "perplexity_reduction": { "type": "number" }
+          }
+        },
+        "benchmarks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "score": { "type": "number" },
+              "baseline_score": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "intended_use": {
+      "type": "object",
+      "required": ["primary_use", "users"],
+      "properties": {
+        "primary_use": {
+          "type": "string",
+          "description": "Primary intended use case"
+        },
+        "users": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Intended user groups"
+        },
+        "use_cases": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Validated use cases"
+        },
+        "out_of_scope": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Use cases NOT supported"
+        }
+      }
+    },
+    "limitations": {
+      "type": "object",
+      "properties": {
+        "technical": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Technical limitations"
+        },
+        "domain": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Domain-specific limitations"
+        },
+        "language": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Language limitations"
+        },
+        "known_issues": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Known issues or failure modes"
+        }
+      }
+    },
+    "bias_and_fairness": {
+      "type": "object",
+      "properties": {
+        "training_data_biases": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Known biases in training data"
+        },
+        "mitigation_steps": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Steps taken to mitigate biases"
+        },
+        "evaluation_results": {
+          "type": "string",
+          "description": "Bias evaluation results"
+        }
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "properties": {
+        "quantization": {
+          "type": "string",
+          "description": "Quantization method (e.g., '4bit-nf4', '8bit')"
+        },
+        "formats": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Available formats (e.g., 'gguf', 'safetensors')"
+        },
+        "min_requirements": {
+          "type": "object",
+          "properties": {
+            "ram_gb": { "type": "number" },
+            "vram_gb": { "type": "number" },
+            "storage_gb": { "type": "number" }
+          }
+        },
+        "inference_speed": {
+          "type": "object",
+          "properties": {
+            "cpu_tokens_per_sec": { "type": "number" },
+            "gpu_tokens_per_sec": { "type": "number" }
+          }
+        },
+        "registry": {
+          "type": "object",
+          "properties": {
+            "huggingface": { "type": "string" },
+            "private": { "type": "string" }
+          }
+        }
+      }
+    },
+    "api": {
+      "type": "object",
+      "properties": {
+        "input_format": {
+          "type": "object",
+          "properties": {
+            "max_tokens": { "type": "integer" },
+            "template": { "type": "string" }
+          }
+        },
+        "output_format": {
+          "type": "object",
+          "properties": {
+            "max_tokens": { "type": "integer" },
+            "stop_tokens": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "recommended_parameters": {
+          "type": "object",
+          "properties": {
+            "temperature": { "type": "number" },
+            "top_p": { "type": "number" },
+            "repetition_penalty": { "type": "number" }
+          }
+        },
+        "system_prompt": {
+          "type": "string",
+          "description": "Recommended system prompt"
+        }
+      }
+    },
+    "ethics": {
+      "type": "object",
+      "properties": {
+        "data_consent": {
+          "type": "string",
+          "description": "Data consent status"
+        },
+        "data_sovereignty": {
+          "type": "string",
+          "description": "Data sovereignty considerations"
+        },
+        "privacy_measures": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "environmental_impact": {
+          "type": "string",
+          "description": "Training carbon footprint"
+        }
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Organization or individual who created the model"
+    },
+    "license": {
+      "type": "string",
+      "description": "Model license"
+    }
+  }
+}

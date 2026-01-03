@@ -1,0 +1,16 @@
+# Directory structure for Data Factory project
+# These directories will be created during project initialization
+
+data/raw/
+data/annotated/
+data/cleaned/
+data/training/
+data/splits/
+models/checkpoints/
+models/quantized/
+metrics/
+logs/
+docs/research-system/
+docs/data-system/
+docs/ml-system/
+docs/consent-log/

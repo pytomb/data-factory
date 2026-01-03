@@ -1,0 +1,34 @@
+{
+  "name": "data-factory-template",
+  "version": "1.0.0",
+  "description": "Data Factory - Domain Model Training Platform for collecting data, training models, and handing off to MVP Factory",
+  "main": "index.js",
+  "scripts": {
+    "create-project": "node scripts/create-project.js",
+    "validate:dataset": "node scripts/validate-dataset.js",
+    "check:gates": "node scripts/check-gates.js",
+    "forge:dev": "cd apps/forge-web && npm run dev",
+    "forge:build": "cd apps/forge-web && npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ai",
+    "ml",
+    "fine-tuning",
+    "data-collection",
+    "model-training",
+    "llm",
+    "consulting"
+  ],
+  "author": "Ekow Solutions Group",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dnice1975/data-factory-template"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

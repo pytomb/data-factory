@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://data-factory.ekow.solutions/schemas/training-data.schema.json",
+  "title": "Training Data Schema",
+  "description": "JSON Schema for fine-tuning training data in instruction/input/output format",
+  "type": "object",
+  "required": ["instruction", "output"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the training example",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "instruction": {
+      "type": "string",
+      "description": "System context or task description for the model",
+      "minLength": 1
+    },
+    "input": {
+      "type": "string",
+      "description": "User input or question. Can be empty for tasks without user input.",
+      "default": ""
+    },
+    "output": {
+      "type": "string",
+      "description": "Expected model response",
+      "minLength": 1
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional metadata for tracking and filtering",
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Original source of this example"
+        },
+        "topic": {
+          "type": "string",
+          "description": "Subject topic (e.g., 'arithmetic', 'biology')"
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": ["elementary", "middle", "high", "university", "professional"],
+          "description": "Difficulty level of the content"
+        },
+        "language": {
+          "type": "string",
+          "description": "Language code (e.g., 'en-gh', 'twi', 'nzema')"
+        },
+        "dialect_markers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Local dialect terms or phrases used"
+        },
+        "local_context": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Local context references (e.g., 'market', 'cedis')"
+        },
+        "quality_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Human-assigned quality score"
+        },
+        "annotator": {
+          "type": "string",
+          "description": "ID of the annotator who created/reviewed this"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "id": "math-001",
+      "instruction": "You are a helpful STEM tutor for students in Ghana. Use local context and currency.",
+      "input": "How do I calculate profit if I buy yams for 10 cedis and sell them for 15 cedis?",
+      "output": "Medaaase (Thank you) for your question! To calculate profit, subtract your buying price from your selling price.\n\nProfit = Selling Price - Buying Price\nProfit = 15 cedis - 10 cedis\nProfit = 5 cedis\n\nSo you made 5 cedis profit! That's a 50% profit margin (5/10 × 100). Good trading!",
+      "metadata": {
+        "source": "ghana-math-curriculum-jhs2",
+        "topic": "arithmetic",
+        "difficulty": "middle",
+        "language": "en-gh",
+        "dialect_markers": ["cedis", "Medaaase"],
+        "local_context": ["yams", "trading", "market"],
+        "quality_score": 95,
+        "annotator": "expert-001"
+      }
+    },
+    {
+      "id": "bio-001",
+      "instruction": "You are a helpful science tutor for students in rural Ghana. Explain concepts using local examples.",
+      "input": "What is photosynthesis?",
+      "output": "Photosynthesis is how plants make their own food using sunlight!\n\nThink about the cassava and plantain farms around Ellembelle. Those plants use:\n1. Sunlight from the sun\n2. Water from the rain or irrigation\n3. Carbon dioxide from the air\n\nThey mix these together in their green leaves to make glucose (sugar) for energy, and release oxygen for us to breathe.\n\nThat's why farms do better in the sunny season - more sunlight means more food for the plants!",
+      "metadata": {
+        "source": "ghana-science-curriculum",
+        "topic": "biology",
+        "difficulty": "middle",
+        "language": "en-gh",
+        "local_context": ["cassava", "plantain", "Ellembelle", "farming"],
+        "quality_score": 92,
+        "annotator": "expert-002"
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "project_name": "{{PROJECT_NAME}}",
+  "display_name": "{{DISPLAY_NAME}}",
+  "factory_version": "1.0.0",
+  "domain": {
+    "name": "{{DOMAIN_NAME}}",
+    "languages": ["en"],
+    "use_cases": []
+  },
+  "base_model": {
+    "id": "google/gemma-2b-it",
+    "provider": "google",
+    "size": "2B"
+  },
+  "target_hardware": {
+    "type": "edge",
+    "min_memory_gb": 4,
+    "quantization": "4bit-nf4"
+  },
+  "created_at": "{{CREATED_AT}}",
+  "last_updated": "{{CREATED_AT}}"
+}

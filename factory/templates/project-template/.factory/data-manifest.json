@@ -1,0 +1,6 @@
+{
+  "project_id": "{{PROJECT_NAME}}",
+  "datasets": {},
+  "models": {},
+  "last_updated": "{{CREATED_AT}}"
+}

@@ -1,0 +1,91 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+.venv/
+
+# ML/Training
+*.gguf
+*.safetensors
+*.bin
+*.pt
+*.pth
+checkpoints/
+outputs/
+wandb/
+
+# Data (keep structure, ignore large files)
+data/raw/*.json
+data/raw/*.jsonl
+data/raw/*.csv
+data/annotated/*.json
+data/annotated/*.jsonl
+data/cleaned/*.json
+data/cleaned/*.jsonl
+data/training/*.json
+data/training/*.jsonl
+data/splits/*.jsonl
+
+# Models (ignore actual model files)
+models/checkpoints/
+models/quantized/
+
+# But keep directory structure
+!data/raw/.gitkeep
+!data/annotated/.gitkeep
+!data/cleaned/.gitkeep
+!data/training/.gitkeep
+!data/splits/.gitkeep
+!models/checkpoints/.gitkeep
+!models/quantized/.gitkeep
+
+# Secrets
+*.pem
+*.key
+credentials.json
+token.json
+
+# Temporary files
+*.tmp
+*.temp
+.cache/

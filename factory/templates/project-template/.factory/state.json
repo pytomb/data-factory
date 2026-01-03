@@ -1,0 +1,37 @@
+{
+  "project_name": "{{PROJECT_NAME}}",
+  "created_at": "{{CREATED_AT}}",
+  "last_updated": "{{CREATED_AT}}",
+  "execution_mode": "interactive",
+  "current_step": "intake",
+  "steps": {
+    "intake": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "sources": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "ethics": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "capture": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "annotate": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "validate": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "clean": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "format": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "split": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "baseline": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "finetune": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "evaluate": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "quantize": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "registry": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "edge-test": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "model-card": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "api-spec": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null },
+    "examples": { "status": "pending", "started_at": null, "completed_at": null, "output_files": [], "expert_reviewed": false, "error": null, "skipped_reason": null }
+  },
+  "gates": {},
+  "reviews": {},
+  "audit_log": [
+    {
+      "timestamp": "{{CREATED_AT}}",
+      "action": "project_created",
+      "details": "Data Factory project initialized",
+      "actor": "system"
+    }
+  ]
+}
