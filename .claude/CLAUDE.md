@@ -48,11 +48,45 @@ This shows:
 
 ### Current Projects
 
+**NHIS-demo1** (`projects/NHIS-demo1/`)
+- **Domain**: Ghana NHIS Claims Pre-Check Agent
+- **Languages**: English (Ghana), Pidgin (future)
+- **Base Model**: unsloth/gemma-2-2b-it-bnb-4bit
+- **Current State**: Training phase, `finetune` step pending
+- **Training Data**: 50 samples (40 train / 5 val / 5 test)
+
 **Ellembelle Education** (`projects/ellembelle-education/`)
 - **Domain**: STEM tutoring for Ellembelle District, Ghana
 - **Languages**: English (Ghana), Twi, Nzema, Fante
 - **Base Model**: google/gemma-2b-it (2B params)
 - **Current State**: Discovery phase, `sources` step pending
+
+### Google Drive Integration
+
+**Local Google Drive is mounted at `G:\My Drive\`**
+
+Training data and models sync automatically with Google Colab:
+
+```
+G:\My Drive\DataFactory\
+├── NHIS-demo1/
+│   ├── training_data.jsonl    ← Synced, ready for Colab
+│   └── outputs/               ← Trained models sync back here
+└── <future-projects>/
+```
+
+**Colab Workflow:**
+1. Training data is auto-copied to `G:\My Drive\DataFactory\<project>\`
+2. Open notebook in Colab, set T4 GPU runtime
+3. Trained model saves to `outputs/lora_adapter/`
+4. Model syncs back to local Drive automatically
+
+### Real-Time Monitoring (Optional but Recommended)
+Training on Colab is often a "black box". Use the built-in webhook bridge to stream loss metrics to your local Forge UI:
+
+1. **Start Tunnel**: `npm run forge:tunnel` -> Copy `.trycloudflare.com` URL
+2. **Configure Notebook**: Paste URL into `WEBHOOK_URL` in `02_colab_training.ipynb`
+3. **Monitor**: Watch training curves at `http://localhost:3002` while Colab runs
 
 ### Quick Commands
 
@@ -61,10 +95,13 @@ This shows:
 npm run validate:dataset data/training/dataset.jsonl
 
 # Check all gates
-npm run check:gates projects/<project-name>
+npx tsx scripts/check-gates.ts projects/<project-name>
 
 # Create new project
-npm run create-project <name> --domain <domain>
+node scripts/create-project.js <name>
+
+# Sync training data to Google Drive (for Colab)
+cp projects/<project-name>/data/training/training_data.jsonl "/g/My Drive/DataFactory/<project-name>/"
 ```
 
 ---
@@ -176,6 +213,56 @@ These gates BLOCK progress until satisfied:
 
 ### Phase 6 Gates
 - `integration-ready` - Model card complete, API documented, examples work
+
+---
+
+## 📊 Data Scarcity Score Framework
+
+**The Foundational Question**: Should we fine-tune, or is prompting enough?
+
+See `docs/research-system/data-scarcity-score.md` for the complete framework.
+
+### Quick Reference
+
+**Core Principle**: Fine-tune when knowledge is MISSING from base model training data, not when prompting is inconvenient.
+
+### The 40-Point Rubric
+
+| Category | What It Measures | Points |
+|----------|------------------|--------|
+| Knowledge Exclusivity | How unique is this to your sources? | 0-4 |
+| Base Model Failure Rate | How badly does base model fail? | 0-4 |
+| Local Context Requirement | How much does local context matter? | 0-4 |
+| Terminology Specificity | How specialized is the vocabulary? | 0-4 |
+| Format/Structure Requirements | How specific are output needs? | 0-4 |
+| Reasoning Pattern Complexity | How specialized is the reasoning? | 0-4 |
+| Accuracy Stakes | How critical is domain accuracy? | 0-4 |
+| Data Quality Potential | How good can training data be? | 0-4 |
+| Evaluation Feasibility | Can you measure improvement? | 0-4 |
+| Deployment Viability | Can the model actually be used? | 0-4 |
+
+### Score Interpretation
+
+| Score | Assessment | Action |
+|-------|------------|--------|
+| **0-16** | Prompting Zone | Use prompts, RAG, or few-shot. Don't fine-tune. |
+| **17-26** | Gray Zone | Test both approaches. Fine-tuning might help. |
+| **27-34** | Strong Case | Good candidate. Proceed with baseline comparison. |
+| **35-40** | Clear Win | Exceptional opportunity. Fine-tuning will add real value. |
+
+### Gate Integration
+
+The `data-scope-defined` gate requires:
+- Data Scarcity Score ≥ 20/40 (or justified override)
+- Baseline evaluation plan documented
+- Success criteria defined before training begins
+
+### Before Fine-Tuning, Always Ask:
+
+1. "Can a well-prompted base model do this?" → If yes, don't fine-tune
+2. "What specific knowledge is missing from training data?" → Must be concrete
+3. "How will we measure improvement over baseline?" → Must be testable
+4. "What tier is our training data?" → Tier 1-3 required (exclusive/scarce/underrepresented)
 
 ---
 
@@ -420,3 +507,241 @@ npm run dev
 | Infrastructure | Vercel, databases | GPU compute, storage |
 | Time horizon | Weeks | Months |
 | Cold start | No users | No data |
+
+---
+
+## Local Testing & Jupyter Workflow
+
+### Philosophy: Test Locally, Train Remotely
+
+**ALWAYS validate data and debug issues locally before submitting to Google Colab.**
+
+This saves:
+- GPU compute costs
+- Debugging time (local errors are faster to fix)
+- Colab session timeouts from preventable errors
+
+### Two-Part Notebook System
+
+Each project should have two notebooks:
+
+| Notebook | Purpose | Where to Run |
+|----------|---------|--------------|
+| `01_data_validation.ipynb` | Validate data, check formats, find issues | **Local (JupyterLab)** |
+| `02_colab_training.ipynb` | Fine-tune model with GPU | **Google Colab (T4 GPU)** |
+
+### What Can Be Tested Locally (No GPU)
+
+| Task | Local Testing | Notes |
+|------|---------------|-------|
+| JSONL parsing | ✅ Yes | Catch format errors before upload |
+| Required field validation | ✅ Yes | Verify instruction/output fields exist |
+| Duplicate detection | ✅ Yes | MD5 hash comparison |
+| Token length analysis | ✅ Yes | Word-based approximation |
+| Data leakage detection | ✅ Yes | Check train/test overlap |
+| Sample preview | ✅ Yes | See how data will look to model |
+| Chat template formatting | ✅ Yes | Verify Gemma format is correct |
+
+### What Requires Colab (GPU)
+
+| Task | Requires GPU | Notes |
+|------|--------------|-------|
+| Model loading | ✅ Yes | 4-bit quantization needs CUDA |
+| LoRA adapter creation | ✅ Yes | GPU memory operations |
+| Training loop | ✅ Yes | The actual fine-tuning |
+| Inference testing | ✅ Yes | Running the trained model |
+| Model saving/export | ✅ Yes | Merging weights |
+
+### Local Testing Commands
+
+```bash
+# Start JupyterLab for local notebook testing
+cd projects/<project-name>
+jupyter lab
+
+# Or run validation notebook directly
+jupyter execute 01_data_validation.ipynb
+
+# Quick dataset validation without Jupyter
+npm run validate:dataset projects/<project-name>/data/training_data.jsonl
+```
+
+### Colab Workflow
+
+1. **Prepare locally:**
+   - Run `01_data_validation.ipynb` locally
+   - Fix any errors it reports
+   - Verify "READY FOR TRAINING" message
+
+2. **Upload to Drive:**
+   - Create folder: `MyDrive/DataFactory/<project-name>/`
+   - Upload `training_data.jsonl`
+
+3. **Run on Colab:**
+   - Upload `02_colab_training.ipynb` to Colab
+   - Set runtime to T4 GPU
+   - Update config cell with your paths
+   - Click "Run All"
+
+4. **Download results:**
+   - Model saved to `MyDrive/DataFactory/<project-name>/outputs/`
+   - Download `lora_adapter/` folder
+   - Place in local `models/checkpoints/`
+
+### Project Notebook Structure
+
+```
+projects/<project-name>/
+├── 01_data_validation.ipynb    # Run locally - validates data
+├── 02_colab_training.ipynb     # Run on Colab - trains model
+├── data/
+│   ├── training_data.jsonl     # Your training data
+│   └── raw_claims.jsonl        # Raw source data
+├── models/
+│   └── checkpoints/
+│       └── lora_adapter/       # Downloaded from Colab
+└── .env                        # HF_TOKEN (gitignored)
+```
+
+### Debugging Checklist
+
+Before uploading to Colab, verify:
+
+- [ ] `01_data_validation.ipynb` shows "READY FOR TRAINING"
+- [ ] No parse errors in JSONL
+- [ ] No missing required fields (instruction, output)
+- [ ] No duplicates (or acceptable number)
+- [ ] Sample preview looks correct
+- [ ] Token lengths are reasonable (<2048 words)
+
+### Common Local Errors to Fix
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| "File not found" | Wrong path in notebook | Update `TRAINING_DATA_PATH` |
+| "Invalid JSON on line X" | Malformed JSONL | Fix the specific line |
+| "Missing 'instruction'" | Wrong field names | Rename to instruction/output |
+| "X duplicates found" | Repeated samples | Deduplicate or accept |
+| "Empty field on record X" | Blank instruction/output | Remove or fill in |
+
+### Environment Setup
+
+```bash
+# Install JupyterLab (one-time)
+pip install jupyterlab
+
+# Install validation dependencies (one-time)
+pip install datasets pandas
+
+# Start Jupyter for a project
+cd projects/<project-name>
+jupyter lab
+```
+
+### Integration with Workflow Steps
+
+| Workflow Step | Local Notebook | Colab Notebook |
+|---------------|----------------|----------------|
+| `format` | ✅ Validate formatted data | - |
+| `split` | ✅ Check train/val/test splits | - |
+| `baseline` | - | ✅ Run base model eval |
+| `finetune` | - | ✅ Run training |
+| `evaluate` | - | ✅ Run evaluation |
+
+### Trust Level for Notebooks
+
+**Auto-Proceed:**
+- Run local validation notebooks
+- Report validation results
+- Fix obvious data errors
+
+**Require Approval:**
+- Training hyperparameter changes
+- Uploading to Colab
+- Pushing trained models to HuggingFace
+
+---
+
+## Colab Troubleshooting Guide
+
+### Common Issues and Solutions
+
+#### 1. GPU Not Detected (CUDA available: False)
+
+**Symptom:** `torch.cuda.is_available()` returns False even after selecting T4 GPU.
+
+**Root Cause:** Runtime type change requires full restart. Simply clicking "Save" doesn't activate GPU.
+
+**Solution:**
+1. **Runtime → Disconnect and delete runtime** (not just disconnect)
+2. **Runtime → Change runtime type → T4 GPU → Save**
+3. **Runtime → Run all** (must re-run all cells from scratch)
+
+**Important:** Changing runtime clears ALL state - packages, variables, mounted drives. Everything must be re-executed.
+
+#### 2. Unsloth Installation Fails
+
+**Symptom:** `ERROR: Failed building wheel for xformers`
+
+**Root Cause:** The old install command (`pip install unsloth`) tries to build xformers from source, which fails on Colab.
+
+**Solution:** Use the Colab-optimized install:
+```python
+!pip install "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
+!pip install --no-deps trl peft accelerate bitsandbytes
+```
+
+**Note:** The project template (`factory/templates/project-template/02_colab_training.ipynb`) has been updated with this fix.
+
+#### 3. "Module not found" After Runtime Switch
+
+**Cause:** Packages installed before runtime change are wiped.
+
+**Solution:** Re-run install cell after ANY runtime change (GPU type, restart, etc.)
+
+#### 4. GPU Quota Exhausted
+
+**Symptom:** T4 GPU option is greyed out or unavailable.
+
+**Cause:** Colab free tier has daily/weekly GPU quotas.
+
+**Solutions:**
+- Wait a few hours and try again
+- Try at off-peak hours (early morning US time)
+- Consider Colab Pro for guaranteed GPU access
+
+#### 5. Google Drive Not Mounting
+
+**Symptom:** `drive.mount()` hangs or fails.
+
+**Solutions:**
+- Click "Connect to Google Drive" in the popup
+- If popup doesn't appear, run cell again
+- Clear browser cookies for colab.google.com and retry
+
+### Colab Session Checklist
+
+Before running training, verify each step succeeds:
+
+```
+[ ] 1. Runtime set to T4 GPU (Runtime → Change runtime type)
+[ ] 2. Google Drive mounted (should see "Mounted at /content/drive")
+[ ] 3. Unsloth installed (no errors in install cell)
+[ ] 4. GPU check shows "CUDA available: True"
+[ ] 5. Data file exists (should show "Data file exists: True")
+[ ] 6. Model loaded (should show "✅ Model loaded!")
+```
+
+If any step fails, fix it before continuing to the next cell.
+
+### Recovery from Failed State
+
+If Colab gets into a bad state (cells failing, weird errors):
+
+1. **Runtime → Disconnect and delete runtime**
+2. Close the Colab tab
+3. Reopen the notebook from Drive
+4. **Runtime → Change runtime type → T4 GPU**
+5. **Runtime → Run all**
+
+This gives you a completely clean slate.
